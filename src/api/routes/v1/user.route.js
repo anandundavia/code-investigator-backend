@@ -13,7 +13,6 @@ router
     .route('/login')
     .post(routes.login(), controller.login);
 
-
 router.route('/logout')
     .all(controller.logout);
 
