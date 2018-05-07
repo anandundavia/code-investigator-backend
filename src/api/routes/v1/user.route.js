@@ -4,6 +4,7 @@ const { routes } = require('manage-users');
 
 const { suggestions, signup } = require('../../validations/user.validation');
 const controller = require('../../controllers/user.controller');
+const authenticated = require('../../middlewares/authenticated');
 
 const router = express.Router();
 
@@ -19,12 +20,12 @@ router.route('/logout')
     .all(controller.logout);
 
 router.route('/project')
-    .get(controller.project);
+    .get(authenticated, controller.project);
 
 router.route('/suggestions/:query')
-    .get(validate(suggestions), controller.suggestions);
+    .get(validate(suggestions), authenticated, controller.suggestions);
 
 router.route('/me')
-    .get(controller.me);
+    .get(authenticated, controller.me);
 
 module.exports = router;

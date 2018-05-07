@@ -11,7 +11,8 @@ const { handler: errorHandler } = require('../middlewares/error');
  */
 exports.login = (req, res, next) => {
     const user = Object.assign({}, req.user);
-    // Might want to remove some fields off the user.
+    // TODO: Might want to remove some fields off the user.
+    delete user.projects;
     res.json(user);
 };
 
@@ -31,11 +32,8 @@ exports.logout = (req, res, next) => {
  */
 exports.project = async (req, res, next) => {
     try {
-        if (req.user) {
-            const projects = await getUsersProjects(req.user._id);
-            return res.status(httpStatus.OK).json(projects);
-        }
-        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
+        const projects = await getUsersProjects(req.user._id);
+        return res.status(httpStatus.OK).json(projects);
     } catch (error) {
         return errorHandler(error, req, res);
     }
@@ -48,12 +46,9 @@ exports.project = async (req, res, next) => {
  */
 exports.suggestions = async (req, res, next) => {
     try {
-        if (req.user) {
-            const { query } = req.params;
-            const suggestions = await getUserSuggestions(query);
-            return res.status(httpStatus.OK).json({ suggestions });
-        }
-        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
+        const { query } = req.params;
+        const suggestions = await getUserSuggestions(query);
+        return res.status(httpStatus.OK).json({ suggestions });
     } catch (error) {
         return errorHandler(error, req, res);
     }
@@ -66,12 +61,9 @@ exports.suggestions = async (req, res, next) => {
  */
 exports.me = (req, res, next) => {
     try {
-        if (req.user) {
-            const user = Object.assign({}, req.user);
-            delete user.projects;
-            return res.status(httpStatus.OK).json(user);
-        }
-        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
+        const user = Object.assign({}, req.user);
+        delete user.projects;
+        return res.status(httpStatus.OK).json(user);
     } catch (error) {
         return errorHandler(error, req, res);
     }

@@ -21,23 +21,20 @@ const { handler: errorHandler } = require('../middlewares/error');
  */
 exports.register = async (req, res, next) => {
     try {
-        if (req.user) {
-            const project = {
-                name: req.body.name,
-                created_by: new ObjectId(req.user._id),
-                contributors: [new ObjectId(req.user._id)],
-                meta: {
-                    created_at: new Date().getTime(),
-                    updated_at: 0,
-                },
-            };
-            await addNewProject(project);
-            // When the project is added successfully,
-            // It will have _id field in the object
-            await addToUsersProjects(req.user._id, project._id);
-            return res.status(httpStatus.OK).json({ message: 'REGISTERED', project });
-        }
-        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
+        const project = {
+            name: req.body.name,
+            created_by: new ObjectId(req.user._id),
+            contributors: [new ObjectId(req.user._id)],
+            meta: {
+                created_at: new Date().getTime(),
+                updated_at: 0,
+            },
+        };
+        await addNewProject(project);
+        // When the project is added successfully,
+        // It will have _id field in the object
+        await addToUsersProjects(req.user._id, project._id);
+        return res.status(httpStatus.OK).json({ message: 'REGISTERED', project });
     } catch (error) {
         return errorHandler(error, req, res);
     }
@@ -54,7 +51,7 @@ const unlink = file => new Promise((resolve) => {
     });
 });
 
-const uncompress = file => new Promise((resolve, reject) => {
+const decompress = file => new Promise((resolve, reject) => {
     const stream = fs.createReadStream(file.path);
     const unzip = zlib.createGunzip();
     stream.pipe(unzip);
@@ -70,28 +67,25 @@ const uncompress = file => new Promise((resolve, reject) => {
  */
 exports.upload = async (req, res, next) => {
     try {
-        if (req.user) {
-            const { projectID } = req.params;
-            const isUserAllowed = await isUserAContributor(req.user._id, projectID);
-            if (isUserAllowed) {
-                const file = await multer(req, res);
-                const json = await uncompress(file);
-                const report = {
-                    meta: {
-                        submitted_by: req.user._id,
-                        submitted_at: new Date().getTime(),
-                    },
-                    report: json,
-                };
-                await addReportToProject(projectID, report);
-                res.status(httpStatus.OK).json({ message: 'UPLOADED' });
-                return unlink(file);
-            }
-            return res.status(httpStatus.BAD_REQUEST).json({
-                message: 'NOT A CONTRIBUTOR',
-            });
+        const { projectID } = req.params;
+        const isUserAllowed = await isUserAContributor(req.user._id, projectID);
+        if (isUserAllowed) {
+            const file = await multer(req, res);
+            const json = await decompress(file);
+            const report = {
+                meta: {
+                    submitted_by: req.user._id,
+                    submitted_at: new Date().getTime(),
+                },
+                report: json,
+            };
+            await addReportToProject(projectID, report);
+            res.status(httpStatus.OK).json({ message: 'UPLOADED' });
+            return unlink(file);
         }
-        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
+        return res.status(httpStatus.BAD_REQUEST).json({
+            message: 'NOT A CONTRIBUTOR',
+        });
     } catch (error) {
         return errorHandler(error, req, res);
     }
@@ -104,22 +98,19 @@ exports.upload = async (req, res, next) => {
  */
 exports.contributor = async (req, res, next) => {
     try {
-        if (req.user) {
-            const { contributorID } = req.body;
-            const { projectID } = req.body;
-            const isUserAllowed = await isUserAContributor(req.user._id, projectID);
-            if (isUserAllowed) {
-                await addToUsersProjects(contributorID, projectID);
-                await addToProjectsContributor(projectID, contributorID);
-                return res.status(httpStatus.OK).json({
-                    message: 'SUCCESS',
-                });
-            }
-            return res.status(httpStatus.BAD_REQUEST).json({
-                message: 'NOT A CONTRIBUTOR',
+        const { contributorID } = req.body;
+        const { projectID } = req.body;
+        const isUserAllowed = await isUserAContributor(req.user._id, projectID);
+        if (isUserAllowed) {
+            await addToUsersProjects(contributorID, projectID);
+            await addToProjectsContributor(projectID, contributorID);
+            return res.status(httpStatus.OK).json({
+                message: 'SUCCESS',
             });
         }
-        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
+        return res.status(httpStatus.BAD_REQUEST).json({
+            message: 'NOT A CONTRIBUTOR',
+        });
     } catch (error) {
         return errorHandler(error, req, res);
     }
