@@ -3,9 +3,11 @@ const zlib = require('zlib');
 const fs = require('fs');
 const { ObjectId } = require('mongodb');
 const path = require('path');
+const tar = require('tar-stream');
 
 const logger = require('../utils/logger');
 const multer = require('../../config/multer');
+const { uploads } = require('../../config/vars');
 const {
     addNewProject,
     addToUsersProjects,
@@ -55,10 +57,31 @@ const decompress = file => new Promise((resolve, reject) => {
     const stream = fs.createReadStream(file.path);
     const unzip = zlib.createGunzip();
     stream.pipe(unzip);
-    let x = '';
-    unzip.on('data', (chunk) => { x += chunk; });
-    unzip.on('finish', () => { resolve(JSON.parse(x)); });
+    unzip.on('finish', () => { resolve(unzip); });
     unzip.on('error', (err) => { reject(err); });
+});
+
+const extract = tarball => new Promise((resolve, reject) => {
+    const ext = tar.extract();
+    const output = {};
+    ext.on('finish', () => { resolve(output); });
+    ext.on('error', (err) => { reject(err); });
+    ext.on('entry', (header, stream, next) => {
+        let x = '';
+        stream.on('end', next);
+        stream.on('data', (chunk) => { x += chunk; });
+        stream.on('finish', () => {
+            const filtered = uploads.files
+                .filter(aName => header.name.includes(aName.toLowerCase()));
+            if (filtered.length > 0) {
+                const file = filtered[0];
+                output[file] = JSON.parse(x);
+            } else {
+                logger.warn(`Tarball contains ${header.name} file which is not supported.`);
+            }
+        });
+    });
+    tarball.pipe(ext);
 });
 
 /**
@@ -71,13 +94,15 @@ exports.upload = async (req, res, next) => {
         const isUserAllowed = await isUserAContributor(req.user._id, projectID);
         if (isUserAllowed) {
             const file = await multer(req, res);
-            const json = await decompress(file);
+            const tarball = await decompress(file);
+            const extracted = await extract(tarball);
             const report = {
                 meta: {
                     submitted_by: req.user._id,
                     submitted_at: new Date().getTime(),
                 },
-                report: json,
+                report: extracted.report,
+                summary: extracted.summary,
             };
             await addReportToProject(projectID, report);
             res.status(httpStatus.OK).json({ message: 'UPLOADED' });
