@@ -99,7 +99,6 @@ const extract = tarball => new Promise((resolve, reject) => {
  */
 exports.upload = async (req, res, next) => {
     try {
-        console.log('ok');
         const { projectID } = req.params;
         const isUserAllowed = await isUserAContributor(req.user._id, projectID);
         if (isUserAllowed) {
