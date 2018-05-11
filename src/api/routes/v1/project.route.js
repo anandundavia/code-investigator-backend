@@ -4,17 +4,12 @@ const validate = require('express-validation');
 const authenticated = require('../../middlewares/authenticated');
 const controller = require('../../controllers/project.controller');
 const {
-    upload,
     register,
     contributor,
     project,
 } = require('../../validations/project.validation');
 
 const router = express.Router();
-
-router
-    .route('/upload/:projectID')
-    .post(validate(upload), authenticated, controller.upload);
 
 router
     .route('/register')

@@ -24,6 +24,7 @@ module.exports = {
         database: process.env.DB_DB_NAME,
         userCollection: process.env.DB_USER_COLLECTION,
         projectCollection: process.env.DB_PROJECT_COLLECTION,
+        reportCollection: process.env.DB_REPORT_COLLECTION,
     },
     corsOptions: {
         origin: (origin, callback) => {

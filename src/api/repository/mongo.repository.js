@@ -85,12 +85,12 @@ const isUserAContributor = (userID, projectID) => new Promise(async (resolve, re
         .catch(reject);
 });
 
-const addReportToProject = (projectID, json) => new Promise(async (resolve, reject) => {
+const addNewReport = json => new Promise(async (resolve, reject) => {
     if (!db) {
         await connect();
     }
-    db.collection(database.projectCollection)
-        .updateOne({ _id: new ObjectId(projectID) }, { $addToSet: { reports: json } })
+    db.collection(database.reportCollection)
+        .insertOne(json)
         .then(resolve)
         .catch(reject);
 });
@@ -135,7 +135,7 @@ module.exports = {
     addNewProject,
     addToUsersProjects,
     isUserAContributor,
-    addReportToProject,
+    addNewReport,
     getUsersProjects,
     addToProjectsContributor,
     getUserSuggestions,
