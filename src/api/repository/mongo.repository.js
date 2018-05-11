@@ -29,6 +29,7 @@ const connect = () => new Promise((resolve, reject) => {
             db = client.db(database.database);
             connectionIsProgress = false;// unsetting the flag
             return resolve(db);
+            // client.db().collection().findOne()
         });
     });
     return connectionPromise;
@@ -112,9 +113,19 @@ const getUserSuggestions = query => new Promise(async (resolve, reject) => {
         await connect();
     }
     db.collection(database.userCollection)
-        .find({ email: { $regex: `${query}.*@.*` } })
+        .findOne({ email: { $regex: `${query}.*@.*` } })
         .project({ name: 1, email: 1 })
         .toArray()
+        .then(resolve)
+        .catch(reject);
+});
+
+const getProject = projectID => new Promise(async (resolve, reject) => {
+    if (!db) {
+        await connect();
+    }
+    db.collection(database.projectCollection)
+        .findOne({ _id: new ObjectId(projectID) }, { projection: { reports: 0 } })
         .then(resolve)
         .catch(reject);
 });
@@ -128,4 +139,5 @@ module.exports = {
     getUsersProjects,
     addToProjectsContributor,
     getUserSuggestions,
+    getProject,
 };
