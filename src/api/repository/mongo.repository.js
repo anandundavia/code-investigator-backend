@@ -113,7 +113,7 @@ const getUserSuggestions = query => new Promise(async (resolve, reject) => {
         await connect();
     }
     db.collection(database.userCollection)
-        .findOne({ email: { $regex: `${query}.*@.*` } })
+        .find({ email: { $regex: `${query}.*@.*` } })
         .project({ name: 1, email: 1 })
         .toArray()
         .then(resolve)

@@ -16,6 +16,7 @@ node_modules
 
 uploads/*
 
+<<<<<<< HEAD
 # Elastic Beanstalk configuration
 .elasticbeanstalk/
 
@@ -23,3 +24,7 @@ uploads/*
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+=======
+.DS_Store
+.elastic*
+>>>>>>> souvik-backend
