@@ -17,8 +17,15 @@ module.exports = {
         },
     },
 
-    // POST /v1/project/:projectID
+    // GET /v1/project/:projectID
     project: {
+        params: {
+            projectID: Joi.string().required(),
+        },
+    },
+
+    // GET /v1/project/:projectID/submissions
+    submissions: {
         params: {
             projectID: Joi.string().required(),
         },

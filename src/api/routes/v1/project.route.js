@@ -7,6 +7,7 @@ const {
     register,
     contributor,
     project,
+    submissions,
 } = require('../../validations/project.validation');
 
 const router = express.Router();
@@ -22,5 +23,9 @@ router
 router
     .route('/:projectID')
     .get(validate(project), authenticated, controller.project);
+
+router
+    .route('/:projectID/submissions')
+    .get(validate(submissions), authenticated, controller.submissions);
 
 module.exports = router;

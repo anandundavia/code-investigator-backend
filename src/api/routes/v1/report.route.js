@@ -12,7 +12,7 @@ router
     .post(validate(upload), authenticated, controller.upload);
 
 router
-    .route('/tslint/:period')
+    .route('/tslint/:projectID/:period')
     .get(validate(tslint), controller.tslint);
 
 module.exports = router;

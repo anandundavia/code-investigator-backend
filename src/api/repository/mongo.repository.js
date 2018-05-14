@@ -130,6 +130,37 @@ const getProject = projectID => new Promise(async (resolve, reject) => {
         .catch(reject);
 });
 
+const getReportSubmissions = projectID => new Promise(async (resolve, reject) => {
+    if (!db) {
+        await connect();
+    }
+    db.collection(database.reportCollection)
+        .aggregate([
+            { $match: { projectID: new ObjectId(projectID) } },
+            {
+                $lookup: {
+                    from: 'user',
+                    foreignField: '_id',
+                    localField: 'meta.submitted_by',
+                    as: 'meta.submitted_by',
+                },
+            },
+            { $project: { report: 0 } },
+            {
+                $project: {
+                    'meta.submitted_at': 1,
+                    'meta.submitted_by._id': 1,
+                    'meta.submitted_by.name': 1,
+                },
+            },
+            { $unwind: '$meta.submitted_by' },
+            { $limit: 10 },
+        ])
+        .toArray()
+        .then(resolve)
+        .catch(reject);
+});
+
 module.exports = {
     connect,
     addNewProject,
@@ -140,4 +171,5 @@ module.exports = {
     addToProjectsContributor,
     getUserSuggestions,
     getProject,
+    getReportSubmissions,
 };

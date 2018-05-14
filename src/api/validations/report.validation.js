@@ -9,9 +9,10 @@ module.exports = {
         },
     },
 
-    // POST /v1/report/tslint
+    // POST /v1/report/tslint/:projectID/:period?sort=rule
     tslint: {
         params: {
+            projectID: Joi.string().required(),
             period: Joi.string().only('recent', 'all', 'week').required(),
         },
         query: {

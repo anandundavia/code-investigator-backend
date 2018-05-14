@@ -7,6 +7,7 @@ const {
     isUserAContributor,
     addToProjectsContributor,
     getProject,
+    getReportSubmissions,
 } = require('../repository/mongo.repository');
 const { handler: errorHandler } = require('../middlewares/error');
 
@@ -72,6 +73,27 @@ exports.project = async (req, res, next) => {
         if (isUserAllowed) {
             const project = await getProject(projectID);
             return res.status(httpStatus.OK).json(project);
+        }
+        return res.status(httpStatus.BAD_REQUEST).json({
+            message: 'NOT A CONTRIBUTOR',
+        });
+    } catch (error) {
+        return errorHandler(error, req, res);
+    }
+};
+
+
+/**
+ * Returns the list of submissions summary of reports for a project
+ * @public
+ */
+exports.submissions = async (req, res, next) => {
+    try {
+        const { projectID } = req.params;
+        const isUserAllowed = await isUserAContributor(req.user._id, projectID);
+        if (isUserAllowed) {
+            const submissions = await getReportSubmissions(projectID);
+            return res.status(httpStatus.OK).json(submissions);
         }
         return res.status(httpStatus.BAD_REQUEST).json({
             message: 'NOT A CONTRIBUTOR',
