@@ -43,8 +43,7 @@ exports.register = async (req, res, next) => {
  */
 exports.contributor = async (req, res, next) => {
     try {
-        const { contributorID } = req.body;
-        const { projectID } = req.body;
+        const { contributorID, projectID } = req.body;
         const isUserAllowed = await isUserAContributor(req.user._id, projectID);
         if (isUserAllowed) {
             await addToUsersProjects(contributorID, projectID);

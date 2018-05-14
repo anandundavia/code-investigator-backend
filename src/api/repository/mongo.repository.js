@@ -127,8 +127,38 @@ const getProject = projectID => new Promise(async (resolve, reject) => {
         await connect();
     }
     db.collection(database.projectCollection)
-        .findOne({ _id: new ObjectId(projectID) }, { projection: { reports: 0 } })
-        .then(resolve)
+        .aggregate([
+            { $match: { _id: new ObjectId(projectID) } },
+            { $unwind: '$contributors' },
+            {
+                $lookup: {
+                    from: 'user',
+                    foreignField: '_id',
+                    localField: 'contributors',
+                    as: 'contributors',
+                },
+            },
+            { $unwind: '$contributors' },
+            {
+                $project: {
+                    'contributors.salt': 0,
+                    'contributors.hash': 0,
+                    'contributors.meta': 0,
+                    'contributors.projects': 0,
+                },
+            },
+            {
+                $group: {
+                    _id: '$_id',
+                    contributors: { $push: '$contributors' },
+                    name: { $first: '$name' },
+                    created_by: { $first: '$created_by' },
+                    meta: { $first: '$meta' },
+                },
+            },
+        ])
+        .toArray()
+        .then(items => resolve(items[0]))
         .catch(reject);
 });
 

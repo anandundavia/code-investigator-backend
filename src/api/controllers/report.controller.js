@@ -15,56 +15,38 @@ const {
     getSummaryOfReport,
 } = require('../repository/mongo.repository');
 
-
-// TODO: Finish this controller
-// const getReportByRule = (user, period) => {
-// };
-
-// const getReportByFile = (user, period) => {
-// };
-
-
-/**
- * Upload a report
- * @public
- */
-exports.tslint = (req, res, next) => {
+const summary = async (req, res, next) => {
     try {
-        if (req.user) {
-            // const { period } = req.params;
-            const { sort } = req.query;
-
-            // switch (sort) {
-            //     case 'rule':
-            //         getReportByRule(req.user, period);
-            //         break;
-            //     case 'file':
-            //         getReportByFile(req.user, period);
-            //         break;
-            //     default:
-            //         return res.status(httpStatus.BAD_REQUEST).send({ message: `sort type '${sort}' is not implemented yet` });
-            // }
-            return res.status(httpStatus.BAD_REQUEST).send({ message: `sort type '${sort}' is not implemented yet` });
-        }
-        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
+        const { projectID, period } = req.params;
+        const summaryToSend = await getSummaryOfReport(projectID, period);
+        return res.status(httpStatus.OK).json(summaryToSend);
     } catch (error) {
         return errorHandler(error, req, res);
     }
 };
 
+const details = async (req, res, next) => {
+    try {
+        return res.status(httpStatus.OK).json({ message: 'NOT_IMPLEMENTED_YET' });
+    } catch (error) {
+        return errorHandler(error, req, res);
+    }
+};
 
 /**
- * Upload a report
+ * Returns the tslint reports (or parts of it) according to the params and query
  * @public
  */
-exports.summary = async (req, res, next) => {
+exports.tslint = async (req, res, next) => {
     try {
         if (req.user) {
-            const { projectID, period } = req.params;
+            const { projectID, type } = req.params;
             const isUserAllowed = await isUserAContributor(req.user._id, projectID);
             if (isUserAllowed) {
-                const summary = await getSummaryOfReport(projectID, period);
-                return res.status(httpStatus.OK).json(summary);
+                if (type === 'summary') {
+                    return summary(req, res, next);
+                }
+                return details(req, res, next);
             }
             return res.status(httpStatus.BAD_REQUEST).json({
                 message: 'NOT A CONTRIBUTOR',
