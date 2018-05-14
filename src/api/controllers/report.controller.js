@@ -12,6 +12,7 @@ const { uploads } = require('../../config/vars');
 const {
     isUserAContributor,
     addNewReport,
+    getSummaryOfReport,
 } = require('../repository/mongo.repository');
 
 
@@ -50,6 +51,31 @@ exports.tslint = (req, res, next) => {
         return errorHandler(error, req, res);
     }
 };
+
+
+/**
+ * Upload a report
+ * @public
+ */
+exports.summary = async (req, res, next) => {
+    try {
+        if (req.user) {
+            const { projectID, period } = req.params;
+            const isUserAllowed = await isUserAContributor(req.user._id, projectID);
+            if (isUserAllowed) {
+                const summary = await getSummaryOfReport(projectID, period);
+                return res.status(httpStatus.OK).json(summary);
+            }
+            return res.status(httpStatus.BAD_REQUEST).json({
+                message: 'NOT A CONTRIBUTOR',
+            });
+        }
+        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
+    } catch (error) {
+        return errorHandler(error, req, res);
+    }
+};
+
 
 const unlink = file => new Promise((resolve) => {
     fs.unlink(file.path, (err) => {
