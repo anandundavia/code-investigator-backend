@@ -9,7 +9,7 @@ let connectionIsProgress = false;
 let connectionPromise = null;
 
 /**
- * Opens the connection to database and saves the conneciton in 'db' variable.
+ * Opens the connection to database and saves the connection in 'db' variable.
  * @returns {Promise} A promise that will be resolved to the database connection if successful
  */
 const connect = () => new Promise((resolve, reject) => {
@@ -29,6 +29,7 @@ const connect = () => new Promise((resolve, reject) => {
             db = client.db(database.database);
             connectionIsProgress = false;// unsetting the flag
             return resolve(db);
+            // client.db().collection().findOne()
         });
     });
     return connectionPromise;
@@ -84,12 +85,12 @@ const isUserAContributor = (userID, projectID) => new Promise(async (resolve, re
         .catch(reject);
 });
 
-const addReportToProject = (projectID, json) => new Promise(async (resolve, reject) => {
+const addNewReport = json => new Promise(async (resolve, reject) => {
     if (!db) {
         await connect();
     }
-    db.collection(database.projectCollection)
-        .updateOne({ _id: new ObjectId(projectID) }, { $addToSet: { reports: json } })
+    db.collection(database.reportCollection)
+        .insertOne(json)
         .then(resolve)
         .catch(reject);
 });
@@ -112,9 +113,19 @@ const getUserSuggestions = query => new Promise(async (resolve, reject) => {
         await connect();
     }
     db.collection(database.userCollection)
-        .find({ email: { $regex: `${query}.*@.*` } })
+        .findOne({ email: { $regex: `${query}.*@.*` } })
         .project({ name: 1, email: 1 })
         .toArray()
+        .then(resolve)
+        .catch(reject);
+});
+
+const getProject = projectID => new Promise(async (resolve, reject) => {
+    if (!db) {
+        await connect();
+    }
+    db.collection(database.projectCollection)
+        .findOne({ _id: new ObjectId(projectID) }, { projection: { reports: 0 } })
         .then(resolve)
         .catch(reject);
 });
@@ -124,8 +135,9 @@ module.exports = {
     addNewProject,
     addToUsersProjects,
     isUserAContributor,
-    addReportToProject,
+    addNewReport,
     getUsersProjects,
     addToProjectsContributor,
     getUserSuggestions,
+    getProject,
 };

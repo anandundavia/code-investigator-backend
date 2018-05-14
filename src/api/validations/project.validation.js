@@ -1,12 +1,6 @@
 const Joi = require('joi');
 
 module.exports = {
-    // POST /v1/project/upload
-    upload: {
-        params: {
-            projectID: Joi.string().required(),
-        },
-    },
 
     // POST /v1/project/register
     register: {
@@ -19,6 +13,13 @@ module.exports = {
     contributor: {
         body: {
             contributorID: Joi.string().required(),
+            projectID: Joi.string().required(),
+        },
+    },
+
+    // POST /v1/project/:projectID
+    project: {
+        params: {
             projectID: Joi.string().required(),
         },
     },
