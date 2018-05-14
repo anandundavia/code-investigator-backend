@@ -187,8 +187,8 @@ const getSummaryOfReport = (projectID, period) => new Promise(async (resolve, re
         limit = Number.MAX_SAFE_INTEGER;
     }
     db.collection(database.reportCollection)
-        .find(find, { projection: { summary: 1 } })
-        .sort({ 'meta.submitted_at': -1 })
+        .find(find, { projection: { summary: 1, meta: 1 } })
+        .sort({ 'meta.submitted_at': 1 })
         .limit(limit)
         .toArray()
         .then(resolve)
