@@ -122,7 +122,6 @@ exports.upload = async (req, res, next) => {
             message: 'NOT A CONTRIBUTOR',
         });
     } catch (error) {
-        console.log(error);
         return errorHandler(error, req, res);
     }
 };

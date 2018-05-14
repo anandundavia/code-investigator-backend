@@ -68,12 +68,11 @@ exports.contributor = async (req, res, next) => {
 exports.project = async (req, res, next) => {
     try {
         const { projectID } = req.params;
-        console.log("projectid", projectID);
-        // const isUserAllowed = await isUserAContributor(req.user._id, projectID);
-        // if (isUserAllowed) {
+        const isUserAllowed = await isUserAContributor(req.user._id, projectID);
+        if (isUserAllowed) {
             const project = await getProject(projectID);
             return res.status(httpStatus.OK).json(project);
-        // }
+        }
         return res.status(httpStatus.BAD_REQUEST).json({
             message: 'NOT A CONTRIBUTOR',
         });
