@@ -18,7 +18,7 @@ const { handler: errorHandler } = require('../middlewares/error');
 exports.register = async (req, res, next) => {
     try {
         const project = {
-            name: req.body.name,
+            ...req.body,
             created_by: new ObjectId(req.user._id),
             contributors: [new ObjectId(req.user._id)],
             meta: {

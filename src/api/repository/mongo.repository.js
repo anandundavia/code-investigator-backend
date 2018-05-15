@@ -103,7 +103,7 @@ const getUsersProjects = userID => new Promise(async (resolve, reject) => {
     }
     db.collection(database.projectCollection)
         .find({ contributors: new ObjectId(userID) })
-        .project({ name: 1, created_by: 1 })
+        .project({ name: 1, created_by: 1, type: 1 })
         .toArray()
         .then(resolve)
         .catch(reject);
@@ -154,6 +154,7 @@ const getProject = projectID => new Promise(async (resolve, reject) => {
                     name: { $first: '$name' },
                     created_by: { $first: '$created_by' },
                     meta: { $first: '$meta' },
+                    type: { $first: '$type' },
                 },
             },
         ])
