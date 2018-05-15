@@ -225,6 +225,39 @@ const getSummaryOfReport = (projectID, period) => new Promise(async (resolve, re
         .catch(reject);
 });
 
+const getDetailsOfReport = (projectID, period) => new Promise(async (resolve, reject) => {
+    if (!db) {
+        await connect();
+    }
+
+    // These are for 'recent'
+    const find = { projectID: new ObjectId(projectID) };
+    let limit = 1;
+
+    if (period === 'week') {
+        const date = new Date();
+        const currentDate = moment().valueOf();
+        const dateAWeekBefore = moment()
+            .subtract(7, 'd') // Subtract the days
+            .subtract(date.getHours(), 'h') // Subtract the remaining hours and minues as well
+            .subtract(date.getMinutes(), 'm') // So that is includes the last whole day
+            // like from wed 00:00 last week to wed 8:30 this week
+            .valueOf();
+        find['meta.submitted_at'] = { $gte: dateAWeekBefore, $lte: currentDate };
+        limit = Number.MAX_SAFE_INTEGER; // TODO: Is this safe?
+    } else if (period === 'all') {
+        limit = Number.MAX_SAFE_INTEGER;
+    }
+    db.collection(database.reportCollection)
+        .find(find, { projection: { summary: 1, meta: 1 } })
+        .sort({ 'meta.submitted_at': 1 })
+        .limit(limit)
+        .toArray()
+        .then(resolve)
+        .catch(reject);
+});
+
+
 module.exports = {
     connect,
     addNewProject,
@@ -237,4 +270,5 @@ module.exports = {
     getProject,
     getReportSubmissions,
     getSummaryOfReport,
+    getDetailsOfReport,
 };

@@ -13,6 +13,7 @@ const {
     isUserAContributor,
     addNewReport,
     getSummaryOfReport,
+    getDetailsOfReport,
 } = require('../repository/mongo.repository');
 
 const summary = async (req, res, next) => {
@@ -27,7 +28,9 @@ const summary = async (req, res, next) => {
 
 const details = async (req, res, next) => {
     try {
-        return res.status(httpStatus.OK).json({ message: 'NOT_IMPLEMENTED_YET' });
+        const { projectID, period } = req.params;
+        const detailsToSend = await getDetailsOfReport(projectID, period);
+        return res.status(httpStatus.OK).json(detailsToSend);
     } catch (error) {
         return errorHandler(error, req, res);
     }
