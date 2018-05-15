@@ -103,6 +103,7 @@ const getUsersProjects = userID => new Promise(async (resolve, reject) => {
     }
     db.collection(database.projectCollection)
         .find({ contributors: new ObjectId(userID) })
+        .sort({ 'meta.submitted_at': 1 })
         .project({ name: 1, created_by: 1, type: 1 })
         .toArray()
         .then(resolve)
