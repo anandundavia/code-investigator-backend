@@ -231,7 +231,7 @@ const getDetailsOfReport = (projectID, period) => new Promise(async (resolve, re
     }
 
     // These are for 'recent'
-    const find = { projectID: new ObjectId(projectID) };
+    const match = { projectID: new ObjectId(projectID) };
     let limit = 1;
 
     if (period === 'week') {
@@ -243,15 +243,21 @@ const getDetailsOfReport = (projectID, period) => new Promise(async (resolve, re
             .subtract(date.getMinutes(), 'm') // So that is includes the last whole day
             // like from wed 00:00 last week to wed 8:30 this week
             .valueOf();
-        find['meta.submitted_at'] = { $gte: dateAWeekBefore, $lte: currentDate };
+        match['meta.submitted_at'] = { $gte: dateAWeekBefore, $lte: currentDate };
         limit = Number.MAX_SAFE_INTEGER; // TODO: Is this safe?
     } else if (period === 'all') {
         limit = Number.MAX_SAFE_INTEGER;
     }
     db.collection(database.reportCollection)
-        .find(find, { projection: { summary: 1, meta: 1 } })
-        .sort({ 'meta.submitted_at': 1 })
-        .limit(limit)
+        .aggregate([
+            { $match: match },
+            { $sort: { 'meta.submitted_at': 1 } },
+            { $limit: limit },
+            { $unwind: '$report' },
+            { $group: { _id: { name: '$report.name', ruleSeverity: '$report.ruleSeverity' }, count: { $sum: 1 } } },
+            { $group: { _id: '$_id.name', file: { $first: '$_id.name' }, output: { $push: { ruleSeverity: '$_id.ruleSeverity', count: '$count' } } } },
+            { $project: { _id: 0 } },
+        ])
         .toArray()
         .then(resolve)
         .catch(reject);
