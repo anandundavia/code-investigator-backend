@@ -12,7 +12,7 @@ module.exports = {
     uploads: {
         path: 'uploads',
         incoming: 'report',
-        files: ['report', 'summary'],
+        files: ['report', 'summary', 'quality'],
     },
     session: {
         secret: process.env.SESSION_SECRET,

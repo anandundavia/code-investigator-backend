@@ -122,8 +122,7 @@ exports.upload = async (req, res, next) => {
                     submitted_by: new ObjectId(req.user._id),
                     submitted_at: new Date().getTime(),
                 },
-                report: extracted.report,
-                summary: extracted.summary,
+                ...extracted,
             };
             await addNewReport(report);
             res.status(httpStatus.OK).json({ message: 'UPLOADED' });
