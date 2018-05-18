@@ -6,6 +6,7 @@ module.exports = {
     register: {
         body: {
             name: Joi.string().required(),
+            type: Joi.string().required(),
         },
     },
 
