@@ -28,4 +28,7 @@ router.route('/suggestions/:query')
 router.route('/me')
     .get(authenticated, controller.me);
 
+router.route('/me/submissions')
+    .get(authenticated, controller.submissions);
+
 module.exports = router;

@@ -3,6 +3,7 @@ const httpStatus = require('http-status');
 const {
     getUsersProjects,
     getUserSuggestions,
+    getUserSubmissions,
 } = require('../repository/mongo.repository');
 const { handler: errorHandler } = require('../middlewares/error');
 
@@ -64,6 +65,21 @@ exports.me = (req, res, next) => {
         const user = Object.assign({}, req.user);
         delete user.projects;
         return res.status(httpStatus.OK).json(user);
+    } catch (error) {
+        return errorHandler(error, req, res);
+    }
+};
+
+/**
+ * Gets the basic summary for user
+ * Containing the recent submits in the projects he is related to
+ * @public
+ */
+exports.submissions = async (req, res, next) => {
+    try {
+        const user = Object.assign({}, req.user);
+        const submissions = await getUserSubmissions(user._id);
+        return res.status(httpStatus.OK).json(submissions);
     } catch (error) {
         return errorHandler(error, req, res);
     }

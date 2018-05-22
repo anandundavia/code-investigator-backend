@@ -265,6 +265,58 @@ const getDetailsOfReport = (projectID, period) => new Promise(async (resolve, re
         .catch(reject);
 });
 
+const getUserSubmissions = userID => new Promise(async (resolve, reject) => {
+    if (!db) {
+        await connect();
+    }
+    db.collection(database.userCollection)
+        .aggregate([
+            { $match: { _id: new ObjectId(userID) } },
+            { $unwind: '$projects' },
+            {
+                $lookup: {
+                    from: 'project',
+                    foreignField: '_id',
+                    localField: 'projects',
+                    as: '_project',
+                },
+            },
+            { $unwind: '$_project' },
+            {
+                $lookup: {
+                    from: 'report',
+                    foreignField: 'projectID',
+                    localField: 'projects',
+                    as: '_report',
+                },
+            },
+            { $unwind: '$_report' },
+            {
+                $lookup: {
+                    from: 'user',
+                    foreignField: '_id',
+                    localField:
+                        '_report.meta.submitted_by',
+                    as: '_user',
+                },
+            },
+            { $unwind: '$_user' },
+            { $sort: { '_report.meta.submitted_at': -1 } },
+            {
+                $project: {
+                    submitted_at: '$_report.meta.submitted_at',
+                    project: '$_project.name',
+                    user: '$_user.name',
+                    summary: '$_report.summary',
+                },
+            },
+            { $limit: 10 },
+        ])
+        .toArray()
+        .then(resolve)
+        .catch(reject);
+});
+
 
 module.exports = {
     connect,
@@ -279,4 +331,5 @@ module.exports = {
     getReportSubmissions,
     getSummaryOfReport,
     getDetailsOfReport,
+    getUserSubmissions,
 };
