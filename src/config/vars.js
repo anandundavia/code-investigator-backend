@@ -32,6 +32,7 @@ module.exports = {
                 '10.29.9.66',
                 '10.29.9.48',
                 'localhost',
+                'elasticbeanstalk',
             ];
             const index = whiteList.findIndex(anIP => origin.includes(anIP));
             if (!origin || index !== -1) {
