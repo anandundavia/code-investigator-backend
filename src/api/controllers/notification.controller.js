@@ -31,7 +31,7 @@ exports.updateNotifications = async (req, res, next) => {
         const { notificationIDs } = req.body;
         await markSeen(notificationIDs);
         const message = `UPDATED ${notificationIDs.length} NOTIFICATIONS`;
-        return res.status(httpStatus.OK).json(message);
+        return res.status(httpStatus.OK).json({ message });
     } catch (error) {
         return errorHandler(error, req, res);
     }
