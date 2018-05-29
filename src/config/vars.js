@@ -36,6 +36,7 @@ module.exports = {
                 '10.29.9.48',
                 'localhost',
                 '172.29.182.243',
+                'elasticbeanstalk',
             ];
             if (process.env.NODE_ENV === 'development') {
                 whiteList.push('chrome-extension'); // To allow Postman in development
