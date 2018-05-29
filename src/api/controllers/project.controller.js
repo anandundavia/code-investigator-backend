@@ -8,7 +8,7 @@ const {
     addToProjectsContributor,
     getProject,
     getReportSubmissions,
-} = require('../repository/mongo.repository');
+} = require('../repository');
 const { handler: errorHandler } = require('../middlewares/error');
 
 /**

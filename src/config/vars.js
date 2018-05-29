@@ -12,19 +12,22 @@ module.exports = {
     uploads: {
         path: 'uploads',
         incoming: 'report',
-        files: ['report', 'summary', 'quality'],
+        files: ['lint', 'summary', 'quality'],
     },
     session: {
         secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: true,
     },
+    // TODO: As the number of collections increases,
+    //  separate them out in database.collections object
     database: {
         uri: process.env.DB_URI,
         database: process.env.DB_DB_NAME,
         userCollection: process.env.DB_USER_COLLECTION,
         projectCollection: process.env.DB_PROJECT_COLLECTION,
         reportCollection: process.env.DB_REPORT_COLLECTION,
+        notificationCollection: process.env.DB_NOTIFICATION_COLLECTION,
     },
     corsOptions: {
         origin: (origin, callback) => {
@@ -32,8 +35,11 @@ module.exports = {
                 '10.29.9.66',
                 '10.29.9.48',
                 'localhost',
-                'elasticbeanstalk',
+                '172.29.182.243',
             ];
+            if (process.env.NODE_ENV === 'development') {
+                whiteList.push('chrome-extension'); // To allow Postman in development
+            }
             const index = whiteList.findIndex(anIP => origin.includes(anIP));
             if (!origin || index !== -1) {
                 callback(null, true);
@@ -42,5 +48,10 @@ module.exports = {
             }
         },
         credentials: true,
+    },
+    notifications: {
+        type: {
+            invite: 'invite',
+        },
     },
 };

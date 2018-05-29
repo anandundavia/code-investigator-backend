@@ -16,4 +16,19 @@ module.exports = {
             name: Joi.string().required(),
         }).unknown(true),
     },
+
+    // POST: /v1/user/invite
+    sendInvite: {
+        body: {
+            projectID: Joi.string().required(),
+            invitedUserID: Joi.string().required(),
+        },
+    },
+
+    updateInvite: {
+        body: {
+            accepted: Joi.boolean().required(),
+            projectID: Joi.string().required(),
+        },
+    },
 };

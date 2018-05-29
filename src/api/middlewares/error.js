@@ -19,7 +19,7 @@ const handler = (err, req, res, next) => {
         delete response.stack;
     }
 
-    res.status(err.status);
+    res.status(response.code);
     res.json(response);
     res.end();
 };

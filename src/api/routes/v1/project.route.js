@@ -5,7 +5,7 @@ const authenticated = require('../../middlewares/authenticated');
 const controller = require('../../controllers/project.controller');
 const {
     register,
-    contributor,
+    // contributor,
     project,
     submissions,
 } = require('../../validations/project.validation');
@@ -16,9 +16,9 @@ router
     .route('/register')
     .post(validate(register), authenticated, controller.register);
 
-router
-    .route('/contributor')
-    .post(validate(contributor), authenticated, controller.contributor);
+// router
+//     .route('/contributor')
+//     .post(validate(contributor), authenticated, controller.contributor);
 
 router
     .route('/:projectID')

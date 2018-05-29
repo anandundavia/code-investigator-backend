@@ -14,7 +14,7 @@ const {
     addNewReport,
     getSummaryOfReport,
     getDetailsOfReport,
-} = require('../repository/mongo.repository');
+} = require('../repository');
 
 const summary = async (req, res, next) => {
     try {
