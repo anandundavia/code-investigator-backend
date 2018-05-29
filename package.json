@@ -8,11 +8,11 @@
         "node": ">=8"
     },
     "scripts": {
-        "start": "node_modules/.bin/pm2 start ./src/index.js",
+        "start": "node ./src/index.js",
         "dev": "nodemon ./src/index.js",
         "lint": "eslint **/*.js --ignore-path .gitignore --ignore-pattern internals/scripts",
         "test": "cross-env NODE_ENV=test nyc --reporter=html --reporter=text mocha --timeout 20000 --recursive src/api/tests",
-        "stable-v1-dev": "node_modules/.bin/pm2 start ./src/index.js",
+        "stable-v1-dev": "node ./src/index.js",
         "stable-v1-test": "mocha tests/"
     },
     "devDependencies": {
@@ -21,8 +21,7 @@
         "eslint-config-airbnb-base": "^12.0.1",
         "eslint-plugin-import": "^2.2.0",
         "mocha": "^3.3.0",
-        "nodemon": "^1.11.0",
-        "pm2": "^2.10.4"
+        "nodemon": "^1.11.0"
     },
     "dependencies": {
         "compression": "^1.7.2",
