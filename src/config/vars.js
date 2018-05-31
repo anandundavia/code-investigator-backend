@@ -34,6 +34,7 @@ module.exports = {
             const whiteList = [
                 '10.29.9.66',
                 '10.29.9.48',
+                '10.29',
                 'localhost',
                 '172.29.182.243',
                 'elasticbeanstalk',
