@@ -9,6 +9,9 @@ class Notification {
         this.userID = new ObjectId(_userID);
         this.seen = false;
         this.type = _type;
+        this.meta = {
+            created_at: new Date().getTime(),
+        };
         this.details = {};
     }
 
@@ -24,7 +27,7 @@ class Notification {
         try {
             await addNewNotification(this.toJSON());
         } catch (e) {
-            logger.error('Error while adding a new notificaiton');
+            logger.error('Error while adding a new notification');
             logger.error(JSON.stringify(e));
         }
     }

@@ -25,6 +25,7 @@ const getNotifications = (userID, includeAll) => new Promise(async (resolve, rej
     if (!includeAll) { query.seen = false; }
     db.collection(database.notificationCollection)
         .find(query)
+        .sort({ 'meta.submitted_at': 1 })
         .toArray()
         .then(resolve)
         .catch(reject);
