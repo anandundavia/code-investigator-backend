@@ -1,6 +1,6 @@
 const { ObjectId } = require('mongodb');
 
-const { database } = require('../../../../config/vars');
+const { database, notifications } = require('../../../../config/vars');
 
 let db = null;
 let connect = null;
@@ -52,8 +52,32 @@ const markSeen = notificationIDs => new Promise(async (resolve, reject) => {
         .catch(reject);
 });
 
+const updateInvitationNotification = request => new Promise(async (resolve, reject) => {
+    if (!db) {
+        await connect();
+    }
+    const { userID, projectID, accepted } = request;
+    const find = {
+        userID: new ObjectId(userID),
+        type: notifications.type.invite,
+        'details.project._id': new ObjectId(projectID),
+        'details.responded': false,
+    };
+    const update = {
+        $set: {
+            'details.accepted': accepted,
+            'details.responded': true,
+        },
+    };
+    db.collection(database.notificationCollection)
+        .updateOne(find, update)
+        .then(resolve)
+        .catch(reject);
+});
+
 exports.queries = {
     addNewNotification,
     getNotifications,
     markSeen,
+    updateInvitationNotification,
 };
