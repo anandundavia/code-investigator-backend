@@ -1,14 +1,23 @@
 const { ObjectId } = require('mongodb');
 
 const logger = require('../utils/logger');
-const { addNewNotification, getShallowProject, getShallowUser } = require('../repository');
 const { notifications } = require('../../config/vars');
+
+const {
+    addNewNotification,
+    getShallowProject,
+    getShallowUser,
+    updateInvitationNotification,
+} = require('../repository');
 
 class Notification {
     constructor(_userID, _type) {
         this.userID = new ObjectId(_userID);
         this.seen = false;
         this.type = _type;
+        this.meta = {
+            created_at: new Date().getTime(),
+        };
         this.details = {};
     }
 
@@ -24,7 +33,7 @@ class Notification {
         try {
             await addNewNotification(this.toJSON());
         } catch (e) {
-            logger.error('Error while adding a new notificaiton');
+            logger.error('Error while adding a new notification');
             logger.error(JSON.stringify(e));
         }
     }
@@ -34,8 +43,20 @@ class Notification {
         const notification = new Notification(invitedUserID, notifications.type.invite);
         const project = await getShallowProject(projectID);
         const inviter = await getShallowUser(invitedBy);
-        notification.setDetails({ project, inviter });
+        const details = {
+            project,
+            inviter,
+            accepted: null,
+            responded: false,
+        };
+        notification.setDetails(details);
         notification.save();
+    }
+
+    static async updateInvitationNotification(invitation) {
+        // Invitation will have userID, projectID, accepted: true/false
+        // const { userID, projectID, accepted } = invitation;
+        await updateInvitationNotification(invitation);
     }
 }
 module.exports = Notification;

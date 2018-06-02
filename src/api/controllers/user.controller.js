@@ -159,6 +159,7 @@ exports.updateInvite = async (req, res, next) => {
                 projectID,
             };
             await updateInvitation(invitation);
+            await Notification.updateInvitationNotification(invitation);
             if (accepted) {
                 await addToUsersProjects(user._id, projectID);
                 await addToProjectsContributor(projectID, user._id);
