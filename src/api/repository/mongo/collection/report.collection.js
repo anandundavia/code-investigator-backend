@@ -109,8 +109,8 @@ const getDetailsOfReport = (projectID, period) => new Promise(async (resolve, re
             { $match: match },
             { $sort: { 'meta.submitted_at': 1 } },
             { $limit: limit },
-            { $unwind: '$report' },
-            { $group: { _id: { name: '$report.name', ruleSeverity: '$report.ruleSeverity' }, count: { $sum: 1 } } },
+            { $unwind: '$quality' },
+            { $group: { _id: { name: '$quality.name', ruleSeverity: '$quality.ruleSeverity' }, count: { $sum: 1 } } },
             { $group: { _id: '$_id.name', file: { $first: '$_id.name' }, output: { $push: { ruleSeverity: '$_id.ruleSeverity', count: '$count' } } } },
             { $project: { _id: 0 } },
         ])
