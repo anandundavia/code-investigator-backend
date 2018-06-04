@@ -37,8 +37,14 @@ const getUserSuggestions = query => new Promise(async (resolve, reject) => {
     if (!db) {
         await connect();
     }
+    let regexToUse = `${query}.*@.*`;
+    // The query might involve something like someone@xy
+    const containsAtRegex = /.*@.*/;
+    if (query.match(containsAtRegex)) {
+        regexToUse = `${query}.*`;
+    }
     db.collection(database.userCollection)
-        .find({ email: { $regex: `${query}.*@.*` } })
+        .find({ email: { $regex: regexToUse } })
         .project({ name: 1, email: 1 })
         .toArray()
         .then(resolve)
