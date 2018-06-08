@@ -93,6 +93,7 @@ const getUserSubmissions = userID => new Promise(async (resolve, reject) => {
                     submitted_at: '$_report.meta.submitted_at',
                     project: '$_project.name',
                     user: '$_user.name',
+                    userID: '$_user._id',
                     summary: '$_report.summary',
                 },
             },
