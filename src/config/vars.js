@@ -56,4 +56,7 @@ module.exports = {
             invite: 'invite',
         },
     },
+    projects: {
+        supported: ['angular', 'react'],
+    },
 };

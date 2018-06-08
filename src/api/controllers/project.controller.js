@@ -10,6 +10,17 @@ const {
     getReportSubmissions,
 } = require('../repository');
 const { handler: errorHandler } = require('../middlewares/error');
+const { projects } = require('../../config/vars');
+
+
+exports.supported = async (req, res, next) => {
+    try {
+        return res.status(httpStatus.OK).json(projects.supported);
+    } catch (error) {
+        return errorHandler(error, req, res);
+    }
+};
+
 
 /**
  * Register a project

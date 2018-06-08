@@ -12,13 +12,12 @@ const {
 
 const router = express.Router();
 
+router.route('/supported')
+    .get(controller.supported);
+
 router
     .route('/register')
     .post(validate(register), authenticated, controller.register);
-
-// router
-//     .route('/contributor')
-//     .post(validate(contributor), authenticated, controller.contributor);
 
 router
     .route('/:projectID')
