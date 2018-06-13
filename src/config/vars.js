@@ -12,7 +12,10 @@ module.exports = {
     uploads: {
         path: 'uploads',
         incoming: 'report',
-        files: ['lint', 'summary', 'quality'],
+        // this is the name of the field which will be there in the object
+        // that gets stored in the db.
+        // ! DO NOT INCLUDE extensions
+        files: ['lint', 'summary', 'quality', 'coverage-final', 'coverage-summary'],
     },
     session: {
         secret: process.env.SESSION_SECRET,

@@ -92,7 +92,7 @@ const extract = tarball => new Promise((resolve, reject) => {
         stream.on('data', (chunk) => { x += chunk; });
         stream.on('finish', () => {
             const filtered = uploads.files
-                .filter(aName => header.name.includes(aName.toLowerCase()));
+                .filter(aName => path.basename(header.name, '.json') === aName.toLowerCase());
             if (filtered.length > 0) {
                 const file = filtered[0];
                 output[file] = JSON.parse(x);
