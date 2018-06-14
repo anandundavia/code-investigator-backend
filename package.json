@@ -34,7 +34,7 @@
         "helmet": "^3.12.0",
         "http-status": "^1.0.1",
         "joi": "^13.2.0",
-        "manage-users": "^1.0.4",
+        "manage-users": "^1.1.1",
         "moment": "^2.22.1",
         "mongodb": "^3.0.7",
         "morgan": "^1.9.0",
