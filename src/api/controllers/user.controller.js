@@ -27,6 +27,14 @@ exports.login = (req, res, next) => {
     res.status(httpStatus.OK).json(user);
 };
 
+
+exports.changePassword = (req, res, next) => {
+    req.logout();
+    const message = 'PASSWORD_CHANGED. RE-LOGIN';
+    res.status(httpStatus.OK).json({ message });
+};
+
+
 /**
  * Used to clears session and req.user object using passport's req.logout()
  */

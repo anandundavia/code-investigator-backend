@@ -19,6 +19,9 @@ router.route('/signup')
 router.route('/login')
     .post(routes.login(), controller.login);
 
+router.route('/password')
+    .post(authenticated, routes.changePassword(), controller.changePassword);
+
 router.route('/logout')
     .all(controller.logout);
 
