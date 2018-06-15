@@ -37,25 +37,44 @@ const details = async (req, res, next) => {
 };
 
 /**
- * Returns the tslint reports (or parts of it) according to the params and query
+ * Returns the lint reports (or parts of it) according to the params and query
  * @public
  */
-exports.tslint = async (req, res, next) => {
+exports.lint = async (req, res, next) => {
     try {
-        if (req.user) {
-            const { projectID, type } = req.params;
-            const isUserAllowed = await isUserAContributor(req.user._id, projectID);
-            if (isUserAllowed) {
-                if (type === 'summary') {
-                    return summary(req, res, next);
-                }
-                return details(req, res, next);
+        const { projectID, type } = req.params;
+        const isUserAllowed = await isUserAContributor(req.user._id, projectID);
+        if (isUserAllowed) {
+            if (type === 'summary') {
+                return summary(req, res, next);
             }
-            return res.status(httpStatus.BAD_REQUEST).json({
-                message: 'NOT A CONTRIBUTOR',
-            });
+            return details(req, res, next);
         }
-        return res.status(httpStatus.UNAUTHORIZED).json({ message: 'UNAUTHORIZED' });
+        return res.status(httpStatus.BAD_REQUEST).json({
+            message: 'NOT A CONTRIBUTOR',
+        });
+    } catch (error) {
+        return errorHandler(error, req, res);
+    }
+};
+
+/**
+ * Returns the coverage reports (or parts of it) according to the params and query
+ * @public
+ */
+exports.coverage = async (req, res, next) => {
+    try {
+        const { projectID, type } = req.params;
+        const isUserAllowed = await isUserAContributor(req.user._id, projectID);
+        if (isUserAllowed) {
+            if (type === 'summary') {
+                return summary(req, res, next);
+            }
+            return details(req, res, next);
+        }
+        return res.status(httpStatus.BAD_REQUEST).json({
+            message: 'NOT A CONTRIBUTOR',
+        });
     } catch (error) {
         return errorHandler(error, req, res);
     }

@@ -29,7 +29,7 @@ router.route('/project')
     .get(authenticated, controller.project);
 
 router.route('/suggestions/:query')
-    .get(validate(suggestions), authenticated, controller.suggestions);
+    .get(authenticated, validate(suggestions), controller.suggestions);
 
 router.route('/me')
     .get(authenticated, controller.me);
@@ -39,9 +39,9 @@ router.route('/me/submissions')
 
 router.route('/invite')
     .get(authenticated, controller.getInvite)
-    .post(validate(sendInvite), authenticated, controller.sendInvite);
+    .post(authenticated, validate(sendInvite), controller.sendInvite);
 
 router.route('/invite/respond')
-    .post(validate(updateInvite), authenticated, controller.updateInvite);
+    .post(authenticated, validate(updateInvite), controller.updateInvite);
 
 module.exports = router;
