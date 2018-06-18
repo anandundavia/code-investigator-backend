@@ -9,20 +9,24 @@ module.exports = {
         },
     },
 
-    // GET /v1/report/lint/:projectID/:type/:period/
+    // GET /v1/report/summary/:projectID/:period/
+    summary: {
+        projectID: Joi.string().required(),
+        period: Joi.string().only('recent', 'all', 'week').required(),
+    },
+
+    // GET /v1/report/lint/:projectID/:period/
     lint: {
         params: {
             projectID: Joi.string().required(),
-            type: Joi.string().only('summary', 'details').required(),
             period: Joi.string().only('recent', 'all', 'week').required(),
         },
     },
 
-    // GET /v1/report/coverage/:projectID/:type/:period/
+    // GET /v1/report/coverage/:projectID/:period/
     coverage: {
         params: {
             projectID: Joi.string().required(),
-            type: Joi.string().only('summary', 'details').required(),
             period: Joi.string().only('recent', 'all', 'week').required(),
         },
     },

@@ -2,8 +2,14 @@ const express = require('express');
 const validate = require('express-validation');
 
 const controller = require('../../controllers/report.controller');
-const { upload, lint, coverage } = require('../../validations/report.validation');
 const authenticated = require('../../middlewares/authenticated');
+const {
+    summary,
+    upload,
+    lint,
+    coverage,
+} = require('../../validations/report.validation');
+
 
 const router = express.Router();
 
@@ -12,11 +18,15 @@ router
     .post(authenticated, validate(upload), controller.upload);
 
 router
-    .route('/lint/:projectID/:type/:period')
+    .route('/summary/:projectID/:period')
+    .get(authenticated, validate(summary), controller.summary);
+
+router
+    .route('/lint/:projectID/:period')
     .get(authenticated, validate(lint), controller.lint);
 
 router
-    .route('/coverage/:projectID/:type/:period')
+    .route('/coverage/:projectID/:period')
     .get(authenticated, validate(coverage), controller.coverage);
 
 

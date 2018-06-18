@@ -15,7 +15,7 @@ module.exports = {
         // this is the name of the field which will be there in the object
         // that gets stored in the db.
         // ! DO NOT INCLUDE extensions
-        files: ['lint', 'summary', 'quality', 'coverage-final', 'coverage-summary'],
+        files: ['lint', 'summary', 'quality', 'coverage'],
     },
     session: {
         secret: process.env.SESSION_SECRET,

@@ -13,72 +13,9 @@ const {
     isUserAContributor,
     addNewReport,
     getSummaryOfReport,
-    getDetailsOfReport,
+    getLintDetailsOfReport,
+    getCoverageDetailsOfReport,
 } = require('../repository');
-
-const summary = async (req, res, next) => {
-    try {
-        const { projectID, period } = req.params;
-        const summaryToSend = await getSummaryOfReport(projectID, period);
-        return res.status(httpStatus.OK).json(summaryToSend);
-    } catch (error) {
-        return errorHandler(error, req, res);
-    }
-};
-
-const details = async (req, res, next) => {
-    try {
-        const { projectID, period } = req.params;
-        const detailsToSend = await getDetailsOfReport(projectID, period);
-        return res.status(httpStatus.OK).json(detailsToSend);
-    } catch (error) {
-        return errorHandler(error, req, res);
-    }
-};
-
-/**
- * Returns the lint reports (or parts of it) according to the params and query
- * @public
- */
-exports.lint = async (req, res, next) => {
-    try {
-        const { projectID, type } = req.params;
-        const isUserAllowed = await isUserAContributor(req.user._id, projectID);
-        if (isUserAllowed) {
-            if (type === 'summary') {
-                return summary(req, res, next);
-            }
-            return details(req, res, next);
-        }
-        return res.status(httpStatus.BAD_REQUEST).json({
-            message: 'NOT A CONTRIBUTOR',
-        });
-    } catch (error) {
-        return errorHandler(error, req, res);
-    }
-};
-
-/**
- * Returns the coverage reports (or parts of it) according to the params and query
- * @public
- */
-exports.coverage = async (req, res, next) => {
-    try {
-        const { projectID, type } = req.params;
-        const isUserAllowed = await isUserAContributor(req.user._id, projectID);
-        if (isUserAllowed) {
-            if (type === 'summary') {
-                return summary(req, res, next);
-            }
-            return details(req, res, next);
-        }
-        return res.status(httpStatus.BAD_REQUEST).json({
-            message: 'NOT A CONTRIBUTOR',
-        });
-    } catch (error) {
-        return errorHandler(error, req, res);
-    }
-};
 
 
 const unlink = file => new Promise((resolve) => {
@@ -146,6 +83,67 @@ exports.upload = async (req, res, next) => {
             await addNewReport(report);
             res.status(httpStatus.OK).json({ message: 'UPLOADED' });
             return unlink(file);
+        }
+        return res.status(httpStatus.BAD_REQUEST).json({
+            message: 'NOT A CONTRIBUTOR',
+        });
+    } catch (error) {
+        return errorHandler(error, req, res);
+    }
+};
+
+/**
+ * Returns the summary of reports according to the params
+ * @public
+ */
+exports.summary = async (req, res, next) => {
+    try {
+        const { projectID, period } = req.params;
+        const isUserAllowed = await isUserAContributor(req.user._id, projectID);
+        if (isUserAllowed) {
+            const summaryToSend = await getSummaryOfReport(projectID, period);
+            return res.status(httpStatus.OK).json(summaryToSend);
+        }
+        return res.status(httpStatus.BAD_REQUEST).json({
+            message: 'NOT A CONTRIBUTOR',
+        });
+    } catch (error) {
+        return errorHandler(error, req, res);
+    }
+};
+
+
+/**
+ * Returns the lint reports (or parts of it) according to the params and query
+ * @public
+ */
+exports.lint = async (req, res, next) => {
+    try {
+        const { projectID, period } = req.params;
+        const isUserAllowed = await isUserAContributor(req.user._id, projectID);
+        if (isUserAllowed) {
+            const detailsToSend = await getLintDetailsOfReport(projectID, period);
+            return res.status(httpStatus.OK).json(detailsToSend);
+        }
+        return res.status(httpStatus.BAD_REQUEST).json({
+            message: 'NOT A CONTRIBUTOR',
+        });
+    } catch (error) {
+        return errorHandler(error, req, res);
+    }
+};
+
+/**
+ * Returns the coverage reports (or parts of it) according to the params and query
+ * @public
+ */
+exports.coverage = async (req, res, next) => {
+    try {
+        const { projectID, period } = req.params;
+        const isUserAllowed = await isUserAContributor(req.user._id, projectID);
+        if (isUserAllowed) {
+            const detailsToSend = await getCoverageDetailsOfReport(projectID, period);
+            return res.status(httpStatus.OK).json(detailsToSend);
         }
         return res.status(httpStatus.BAD_REQUEST).json({
             message: 'NOT A CONTRIBUTOR',
