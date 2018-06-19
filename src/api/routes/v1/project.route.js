@@ -17,14 +17,14 @@ router.route('/supported')
 
 router
     .route('/register')
-    .post(validate(register), authenticated, controller.register);
+    .post(authenticated, validate(register), controller.register);
 
 router
     .route('/:projectID')
-    .get(validate(project), authenticated, controller.project);
+    .get(authenticated, validate(project), controller.project);
 
 router
     .route('/:projectID/submissions')
-    .get(validate(submissions), authenticated, controller.submissions);
+    .get(authenticated, validate(submissions), controller.submissions);
 
 module.exports = router;

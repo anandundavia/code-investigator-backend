@@ -2,18 +2,32 @@ const express = require('express');
 const validate = require('express-validation');
 
 const controller = require('../../controllers/report.controller');
-const { tslint, upload } = require('../../validations/report.validation');
 const authenticated = require('../../middlewares/authenticated');
+const {
+    summary,
+    upload,
+    lint,
+    coverage,
+} = require('../../validations/report.validation');
+
 
 const router = express.Router();
 
 router
     .route('/upload/:projectID')
-    .post(validate(upload), authenticated, controller.upload);
+    .post(authenticated, validate(upload), controller.upload);
 
 router
-    .route('/tslint/:projectID/:type/:period')
-    .get(validate(tslint), controller.tslint);
+    .route('/summary/:projectID/:period')
+    .get(authenticated, validate(summary), controller.summary);
+
+router
+    .route('/lint/:projectID/:period')
+    .get(authenticated, validate(lint), controller.lint);
+
+router
+    .route('/coverage/:projectID/:period')
+    .get(authenticated, validate(coverage), controller.coverage);
 
 
 module.exports = router;

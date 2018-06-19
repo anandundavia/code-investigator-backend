@@ -49,12 +49,8 @@ const getReportSubmissions = projectID => new Promise(async (resolve, reject) =>
         .catch(reject);
 });
 
-const getSummaryOfReport = (projectID, period) => new Promise(async (resolve, reject) => {
-    if (!db) {
-        await connect();
-    }
-
-    // These are for 'recent'
+const prepareFindAndLimitForReport = (projectID, period) => {
+    // These are filters when period is 'recent'
     const find = { projectID: new ObjectId(projectID) };
     let limit = 1;
 
@@ -63,7 +59,7 @@ const getSummaryOfReport = (projectID, period) => new Promise(async (resolve, re
         const currentDate = moment().valueOf();
         const dateAWeekBefore = moment()
             .subtract(7, 'd') // Subtract the days
-            .subtract(date.getHours(), 'h') // Subtract the remaining hours and minues as well
+            .subtract(date.getHours(), 'h') // Subtract the remaining hours and minuets as well
             .subtract(date.getMinutes(), 'm') // So that is includes the last whole day
             // like from wed 00:00 last week to wed 8:30 this week
             .valueOf();
@@ -72,6 +68,15 @@ const getSummaryOfReport = (projectID, period) => new Promise(async (resolve, re
     } else if (period === 'all') {
         limit = Number.MAX_SAFE_INTEGER;
     }
+
+    return { find, limit };
+};
+
+const getSummaryOfReport = (projectID, period) => new Promise(async (resolve, reject) => {
+    if (!db) {
+        await connect();
+    }
+    const { find, limit } = prepareFindAndLimitForReport(projectID, period);
     db.collection(database.reportCollection)
         .find(find, { projection: { summary: 1, meta: 1 } })
         .sort({ 'meta.submitted_at': 1 })
@@ -81,29 +86,12 @@ const getSummaryOfReport = (projectID, period) => new Promise(async (resolve, re
         .catch(reject);
 });
 
-const getDetailsOfReport = (projectID, period) => new Promise(async (resolve, reject) => {
+const getLintDetailsOfReport = (projectID, period) => new Promise(async (resolve, reject) => {
     if (!db) {
         await connect();
     }
 
-    // These are for 'recent'
-    const match = { projectID: new ObjectId(projectID) };
-    let limit = 1;
-
-    if (period === 'week') {
-        const date = new Date();
-        const currentDate = moment().valueOf();
-        const dateAWeekBefore = moment()
-            .subtract(7, 'd') // Subtract the days
-            .subtract(date.getHours(), 'h') // Subtract the remaining hours and minues as well
-            .subtract(date.getMinutes(), 'm') // So that is includes the last whole day
-            // like from wed 00:00 last week to wed 8:30 this week
-            .valueOf();
-        match['meta.submitted_at'] = { $gte: dateAWeekBefore, $lte: currentDate };
-        limit = Number.MAX_SAFE_INTEGER; // TODO: Is this safe?
-    } else if (period === 'all') {
-        limit = Number.MAX_SAFE_INTEGER;
-    }
+    const { find: match, limit } = prepareFindAndLimitForReport(projectID, period);
     db.collection(database.reportCollection)
         .aggregate([
             { $match: match },
@@ -119,9 +107,32 @@ const getDetailsOfReport = (projectID, period) => new Promise(async (resolve, re
         .catch(reject);
 });
 
+// TODO: Finish This when you deploy CLI!
+const getCoverageDetailsOfReport = (projectID, period) => new Promise(async (resolve, reject) => {
+    if (!db) {
+        await connect();
+    }
+
+    const { find: match, limit } = prepareFindAndLimitForReport(projectID, period);
+    db.collection(database.reportCollection)
+        .aggregate([
+            { $match: match },
+            { $sort: { 'meta.submitted_at': 1 } },
+            { $limit: limit },
+            // { $unwind: '$coverage' },
+            // { $group: { _id: { name: '$coverage.name' }, count: { $sum: 1 } } },
+            // { $group: { _id: '$_id.name', file: { $first: '$_id.name' }, output: { $push: { ruleSeverity: '$_id.ruleSeverity', count: '$count' } } } },
+            // { $project: { _id: 0 } },
+        ])
+        .toArray()
+        .then(resolve)
+        .catch(reject);
+});
+
 exports.queries = {
     addNewReport,
     getReportSubmissions,
     getSummaryOfReport,
-    getDetailsOfReport,
+    getLintDetailsOfReport,
+    getCoverageDetailsOfReport,
 };
