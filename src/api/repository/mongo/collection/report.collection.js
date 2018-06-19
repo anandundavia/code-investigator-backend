@@ -117,12 +117,26 @@ const getCoverageDetailsOfReport = (projectID, period) => new Promise(async (res
     db.collection(database.reportCollection)
         .aggregate([
             { $match: match },
-            { $sort: { 'meta.submitted_at': 1 } },
+            { $sort: { 'meta.submitted_at': -1 } },
             { $limit: limit },
-            // { $unwind: '$coverage' },
+            { $unwind: '$coverage' },
+            {
+                $group: {
+                    _id: '$coverage.name',
+                    name: { $first: '$coverage.name' },
+                    output: {
+                        $push: {
+                            submitted_at: '$meta.submitted_at',
+                            coverage: '$coverage',
+                            summary: '$summary.coverage',
+                        },
+                    },
+                },
+            },
+            { $project: { _id: 0 } },
             // { $group: { _id: { name: '$coverage.name' }, count: { $sum: 1 } } },
             // { $group: { _id: '$_id.name', file: { $first: '$_id.name' }, output: { $push: { ruleSeverity: '$_id.ruleSeverity', count: '$count' } } } },
-            // { $project: { _id: 0 } },
+            
         ])
         .toArray()
         .then(resolve)
