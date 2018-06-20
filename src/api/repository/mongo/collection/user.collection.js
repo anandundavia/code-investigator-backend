@@ -139,8 +139,12 @@ const hasActiveInvitation = (userID, projectID) => new Promise(async (resolve, r
     db.collection(database.userCollection)
         .findOne({
             _id: new ObjectId(userID),
-            'invitations.projectID': new ObjectId(projectID),
-            'invitations.responded': false,
+            invitations: {
+                $elemMatch: {
+                    projectID: new ObjectId(projectID),
+                    responded: false,
+                },
+            },
         })
         .then(resolve)
         .catch(reject);
