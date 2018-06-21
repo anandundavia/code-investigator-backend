@@ -24,6 +24,10 @@ router
     .get(authenticated, validate(project), controller.project);
 
 router
+    .route('/:projectID/config')
+    .get(authenticated, validate(project), controller.downloadConfig);
+
+router
     .route('/:projectID/submissions')
     .get(authenticated, validate(submissions), controller.submissions);
 

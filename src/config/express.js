@@ -6,6 +6,7 @@ const expressSession = require('express-session');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const { config } = require('manage-users');
+const tmp = require('tmp');
 
 const { logs, session, corsOptions } = require('./vars');
 /* eslint-disable-next-line no-unused-vars */
@@ -57,5 +58,8 @@ app.use(error.notFound);
 
 // error handler, send stacktrace only during development
 app.use(error.handler);
+
+// temporary files created using tmp will be deleted on UncaughtException
+tmp.setGracefulCleanup();
 
 module.exports = app;
